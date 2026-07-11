@@ -10,11 +10,19 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-<meta name="theme-color" content="#191B1A">
+<meta name="theme-color" content="#1C1B19">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
+    /* ---- Paint-chip grayscale palette ---- */
+    --phantom:#1C1B19;   /* Phantom Mist  - MEN7070-6 */
+    --gibraltar:#48473F; /* Gibraltar Gray - MEN7070-5 */
+    --antique:#79776F;   /* Antique Silver - MEN7070-4 */
+    --marble:#A6A4A0;    /* Gray Marble    - MEN7070-3 */
+    --slate:#C7C5C1;     /* Cool Slate     - MEN7070-2 */
+    --cotton:#EDEAE4;    /* Arctic Cotton  - MEN7070-1 */
+
     --ink:#191B1A;
     --ink-soft:#5B615C;
     --paper:#FAFAF9;
@@ -25,23 +33,23 @@
     --sidebar-text:#191B1A;
     --sidebar-text-dim:#8A8F89;
 
-    --applied:#6B84A0;
-    --interviewing:#C99A44;
-    --offer:#6F9A6E;
-    --rejected:#B06B5D;
+    --applied:#B7B8BB;
+    --interviewing:#A08A81;
+    --offer:#595D66;
+    --rejected:#272B36;
 
-    --prompts:#7C6A94;
-    --prompts-dark:#5F4E77;
+    --prompts:#79776F;
+    --prompts-dark:#48473F;
     --notes-tab:#C77B45;
     --jobs-tab:#5A7C88;
     --dash-tab:#8A8368;
     --bookmarks-tab:#4E8B8B;
 
-    --n-yellow:#F5E4A0;
-    --n-pink:#F0C4CB;
-    --n-blue:#BFD8E0;
-    --n-green:#C7D9BE;
-    --n-purple:#D6C7E8;
+    --n-yellow:#D7D7D6;
+    --n-pink:#B7B8BB;
+    --n-blue:#A08A81;
+    --n-green:#595D66;
+    --n-purple:#272B36;
     --n-plain:#F7F5EE;
 
     --font-display:'Inter', sans-serif;
@@ -81,7 +89,7 @@
     border-bottom:1px solid var(--line);
     margin-bottom:12px;
   }
-  .brand img{ height:72px; width:auto; display:block; }
+  .brand img{ height:72px; width:auto; display:block; filter:invert(1) brightness(1.15); }
 
   .tab-btn{
     position:relative;
@@ -334,23 +342,30 @@
   .hover-tooltip{
     position:fixed;
     z-index:9999;
-    max-width:280px;
+    width:360px;
+    max-width:calc(100vw - 24px);
     background:var(--card);
     color:var(--ink);
-    padding:12px 14px;
-    border-radius:10px;
+    padding:16px 18px;
+    border-radius:14px;
     border:1px solid var(--line);
     font-family:var(--font-body);
     font-size:12.5px;
-    line-height:1.5;
-    box-shadow:0 10px 28px rgba(35,42,51,0.14);
+    line-height:1.55;
+    box-shadow:0 18px 44px rgba(35,42,51,0.20);
     display:none;
     pointer-events:none;
+    opacity:0;
+    transform:translateY(2px) scale(0.98);
+    transition:opacity .12s ease, transform .12s ease;
   }
-  .hover-tooltip .tt-title{font-weight:600; font-size:13.5px; display:block; margin-bottom:6px; color:var(--ink);}
-  .hover-tooltip .tt-row{display:flex; gap:6px; color:var(--ink-soft); margin-top:3px;}
-  .hover-tooltip .tt-row b{color:var(--ink); font-weight:500; flex-shrink:0;}
-  .hover-tooltip .tt-desc{margin-top:6px; color:var(--ink); white-space:pre-wrap; word-break:break-word; border-top:1px solid var(--line); padding-top:6px;}
+  .hover-tooltip.is-visible{ opacity:1; transform:translateY(0) scale(1); }
+  .hover-tooltip .tt-title{font-weight:600; font-size:14.5px; display:block; margin-bottom:10px; color:var(--ink); line-height:1.35;}
+  .hover-tooltip .tt-meta{margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);}
+  .hover-tooltip .tt-row{display:flex; gap:6px; color:var(--ink-soft); margin-top:4px;}
+  .hover-tooltip .tt-row:first-child{margin-top:0;}
+  .hover-tooltip .tt-row b{color:var(--ink-soft); font-weight:500; flex-shrink:0; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.3px; padding-top:1px;}
+  .hover-tooltip .tt-desc{color:var(--ink); white-space:pre-wrap; word-break:break-word;}
 
   /* ---------- Login overlay ---------- */
   .login-overlay{
@@ -460,7 +475,7 @@
   .sync-dot{width:7px; height:7px; border-radius:50%; background:var(--ink-soft); display:inline-block; opacity:.6;}
   .sync-dot.connected{background:var(--offer); opacity:1;}
   .sheets-code-box{
-    background:var(--ink); color:#D9E0E6; font-family:var(--font-mono); font-size:11.5px; line-height:1.6;
+    background:var(--phantom); color:var(--slate); font-family:var(--font-mono); font-size:11.5px; line-height:1.6;
     padding:12px 14px; border-radius:10px; max-height:180px; overflow:auto; white-space:pre-wrap; margin:8px 0;
   }
   .sheets-steps{font-size:12.5px; color:var(--ink-soft); line-height:1.7; padding-left:18px; margin:6px 0 14px 0;}
@@ -496,7 +511,7 @@
   table.list-table{width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden;}
   table.list-table th{
     text-align:left; font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.5px;
-    color:var(--ink-soft); font-weight:500; padding:11px 14px; border-bottom:1px solid var(--line); background:rgba(35,42,51,0.03);
+    color:var(--ink-soft); font-weight:500; padding:11px 14px; border-bottom:1px solid var(--line); background:rgba(35,42,51,0.035);
   }
   table.list-table td{padding:12px 14px; border-bottom:1px solid var(--line); font-size:13.5px;}
   table.list-table tr:last-child td{border-bottom:none;}
@@ -522,14 +537,14 @@
   .tag-chip.active{background:var(--prompts); color:#fff; border-color:var(--prompts);}
   .prompt-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px;}
   .prompt-card{
-    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:10px;
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:10px; cursor:pointer;
   }
   .prompt-card .ptag{
     align-self:flex-start; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.4px;
     background:var(--prompts); color:#fff; padding:3px 9px; border-radius:20px;
   }
   .prompt-card h4{margin:0; font-family:var(--font-display); font-size:16px; font-weight:600;}
-  .prompt-card .body{font-size:13px; color:var(--ink-soft); line-height:1.5; max-height:80px; overflow:hidden; white-space:pre-wrap;}
+  .prompt-card .body{display:none;}
   .prompt-card .actions{display:flex; gap:6px; margin-top:auto; padding-top:6px; border-top:1px solid var(--line);}
   .copied-tag{font-family:var(--font-mono); font-size:11px; color:var(--offer); margin-left:auto; align-self:center;}
 
@@ -555,12 +570,15 @@
   .note-card h4{margin:0; font-family:var(--font-display); font-size:15.5px; font-weight:600;}
   .note-card .folder-badge{
     align-self:flex-start; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.4px;
-    color:rgba(35,42,51,0.55); background:rgba(35,42,51,0.08); padding:2px 8px; border-radius:20px;
+    color:var(--ink-soft); background:rgba(35,42,51,0.08); padding:2px 8px; border-radius:20px;
   }
   .note-card{cursor:pointer;}
-  .note-card p{margin:0; font-size:13px; line-height:1.5; white-space:pre-wrap; color:var(--ink);}
+  .note-card p{
+    margin:0; font-size:13px; line-height:1.5; color:var(--ink);
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:5; overflow:hidden;
+  }
   .note-card .nfoot{display:flex; align-items:center; margin-top:4px;}
-  .note-card .nfoot .meta{font-family:var(--font-mono); font-size:10px; color:rgba(35,42,51,0.55);}
+  .note-card .nfoot .meta{font-family:var(--font-mono); font-size:10px; color:var(--ink-soft);}
   .note-card .nfoot .sp{margin-left:auto; display:flex; gap:2px;}
 
   /* ---------- Bookmarks ---------- */
@@ -581,7 +599,7 @@
   .bookmark-info .burl{font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .bookmark-card .bfolder{
     align-self:flex-start; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.4px;
-    color:rgba(35,42,51,0.55); background:rgba(35,42,51,0.08); padding:2px 8px; border-radius:20px;
+    color:var(--ink-soft); background:rgba(35,42,51,0.08); padding:2px 8px; border-radius:20px;
   }
   .bookmark-card .actions{display:flex; gap:6px; margin-top:auto; padding-top:2px; border-top:1px solid var(--line);}
   .bookmark-card .actions .sp{margin-left:auto; display:flex; gap:2px;}
@@ -608,7 +626,7 @@
 
   /* ---------- Modal ---------- */
   .modal-overlay{
-    position:fixed; inset:0; background:rgba(35,42,51,0.45); display:flex; align-items:center; justify-content:center;
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
     z-index:100; padding:20px; animation:fadeIn .15s ease;
   }
   .modal-card{
@@ -626,6 +644,13 @@
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .modal-actions{display:flex; justify-content:space-between; align-items:center; margin-top:20px;}
   .modal-actions .right{display:flex; gap:8px;}
+
+  /* ---------- Note detail view (read-only) ---------- */
+  .note-detail-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px;}
+  .note-detail-head h2{margin:0;}
+  .note-detail-meta{display:flex; align-items:center; gap:10px; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--line);}
+  .note-detail-meta .meta{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-soft);}
+  .note-detail-body{font-size:14px; line-height:1.65; white-space:pre-wrap; word-break:break-word; color:var(--ink);}
 
   ::-webkit-scrollbar{width:9px;}
   ::-webkit-scrollbar-thumb{background:rgba(35,42,51,0.25); border-radius:20px;}
@@ -1109,13 +1134,15 @@ function renderJobs(){
     const job = state.jobs.find(j=>j.id===card.dataset.id);
     if(!job) return '';
     let html = `<span class="tt-title">${escapeHTML(job.position)||'Untitled role'}</span>`;
-    if(job.company) html += `<div class="tt-row"><b>Company:</b> ${escapeHTML(job.company)}</div>`;
-    if(job.employmentType) html += `<div class="tt-row"><b>Type:</b> ${escapeHTML(job.employmentType)}</div>`;
-    if(job.salary) html += `<div class="tt-row"><b>Rate:</b> ${escapeHTML(job.salary)}</div>`;
-    if(job.dateApplied) html += `<div class="tt-row"><b>Applied:</b> ${escapeHTML(job.dateApplied)}</div>`;
-    if(job.contact) html += `<div class="tt-row"><b>Contact:</b> ${escapeHTML(job.contact)}</div>`;
-    if(job.scope) html += `<div class="tt-row"><b>Scope:</b> ${escapeHTML(job.scope)}</div>`;
-    if(job.description) html += `<div class="tt-desc">${escapeHTML(job.description.slice(0,220))}${job.description.length>220?'…':''}</div>`;
+    let meta = '';
+    if(job.company) meta += `<div class="tt-row"><b>Company</b> ${escapeHTML(job.company)}</div>`;
+    if(job.employmentType) meta += `<div class="tt-row"><b>Type</b> ${escapeHTML(job.employmentType)}</div>`;
+    if(job.salary) meta += `<div class="tt-row"><b>Rate</b> ${escapeHTML(job.salary)}</div>`;
+    if(job.dateApplied) meta += `<div class="tt-row"><b>Applied</b> ${escapeHTML(job.dateApplied)}</div>`;
+    if(job.contact) meta += `<div class="tt-row"><b>Contact</b> ${escapeHTML(job.contact)}</div>`;
+    if(job.scope) meta += `<div class="tt-row"><b>Scope</b> ${escapeHTML(job.scope)}</div>`;
+    if(meta) html += `<div class="tt-meta">${meta}</div>`;
+    if(job.description) html += `<div class="tt-desc">${escapeHTML(job.description)}</div>`;
     return html;
   });
   kanban.querySelectorAll('.kcol').forEach(col=>{
@@ -1313,6 +1340,50 @@ function afterJobsChanged(){
 /* ================= PROMPTS ================= */
 let activeTagFilter = null;
 
+function promptDetailModalHTML(p){
+  return `
+    <div class="note-detail">
+      <div class="note-detail-head">
+        <h2>${escapeHTML(p.title) || 'Untitled prompt'}</h2>
+        <button type="button" class="icon-btn" id="copy-prompt-detail-btn" title="Copy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </button>
+      </div>
+      ${p.tag? `<div class="note-detail-meta"><span class="folder-badge">${escapeHTML(p.tag)}</span></div>` : ''}
+      <div class="note-detail-body">${escapeHTML(p.content)}</div>
+      <div class="modal-actions">
+        <div><button type="button" class="btn btn-ghost btn-sm" id="delete-prompt-detail-btn" style="color:var(--rejected);border-color:var(--rejected);">Delete</button></div>
+        <div class="right">
+          <button type="button" class="btn btn-ghost" id="close-prompt-detail">Close</button>
+          <button type="button" class="btn btn-ink" id="edit-prompt-detail-btn">Edit</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function openPromptDetailModal(p){
+  openModal(promptDetailModalHTML(p));
+  document.getElementById('close-prompt-detail').addEventListener('click', closeModal);
+  document.getElementById('edit-prompt-detail-btn').addEventListener('click', ()=>{
+    closeModal();
+    openPromptModal(p);
+  });
+  document.getElementById('copy-prompt-detail-btn').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(p.content); }catch(err){ console.error('clipboard error', err); }
+    const btn = document.getElementById('copy-prompt-detail-btn');
+    const original = btn.innerHTML;
+    btn.innerHTML = '✓';
+    setTimeout(()=>{ btn.innerHTML = original; }, 1200);
+  });
+  document.getElementById('delete-prompt-detail-btn').addEventListener('click', async ()=>{
+    if(!confirmAction(`Delete "${p.title || 'this prompt'}"? This cannot be undone.`)) return;
+    state.prompts = state.prompts.filter(x=>x.id!==p.id);
+    logActivity('Prompt', 'Deleted', p.title);
+    await saveState();
+    closeModal();
+    renderPrompts(); renderDashboard();
+  });
+}
 function promptModalHTML(p){
   const isEdit = !!p;
   p = p || { id:'', title:'', tag:'', content:'' };
@@ -1439,11 +1510,18 @@ function renderPrompts(){
     const p = state.prompts.find(x=>x.id===card.dataset.id);
     if(!p) return '';
     let html = `<span class="tt-title">${escapeHTML(p.title)||'Untitled'}</span>`;
-    if(p.tag) html += `<div class="tt-row"><b>Tag:</b> ${escapeHTML(p.tag)}</div>`;
-    html += `<div class="tt-desc">${escapeHTML((p.content||'').slice(0,320))}${(p.content||'').length>320?'…':''}</div>`;
+    if(p.tag) html += `<div class="tt-meta"><div class="tt-row"><b>Tag</b> ${escapeHTML(p.tag)}</div></div>`;
+    html += `<div class="tt-desc">${escapeHTML(p.content||'')}</div>`;
     return html;
   });
 
+  grid.querySelectorAll('.prompt-card').forEach(card=>{
+    card.addEventListener('click', (e)=>{
+      if(e.target.closest('.copy-btn') || e.target.closest('.edit-prompt-btn')) return;
+      const p = state.prompts.find(x=>x.id===card.dataset.id);
+      openPromptDetailModal(p);
+    });
+  });
   grid.querySelectorAll('.copy-btn').forEach(btn=>{
     btn.addEventListener('click', async (e)=>{
       e.stopPropagation();
@@ -1508,6 +1586,52 @@ document.getElementById('save-note-btn').addEventListener('click', async ()=>{
 });
 
 /* ---- note edit modal ---- */
+function noteDetailModalHTML(note){
+  return `
+    <div class="note-detail">
+      <div class="note-detail-head">
+        <h2>${escapeHTML(note.title) || 'Untitled note'}</h2>
+        <button type="button" class="icon-btn pin-btn" data-id="${note.id}" title="Pin">
+          <svg viewBox="0 0 24 24" fill="${note.pinned?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2l1.5 5.5L19 9l-5 3 1 6-3-3.2L9 18l1-6-5-3 5.5-1.5z"/></svg>
+        </button>
+      </div>
+      <div class="note-detail-meta">
+        <span class="folder-badge">${escapeHTML(note.folder || 'General')}</span>
+        <span class="meta">Edited ${new Date(note.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric'})} · ${new Date(note.createdAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span>
+      </div>
+      <div class="note-detail-body">${escapeHTML(note.text)}</div>
+      <div class="modal-actions">
+        <div><button type="button" class="btn btn-ghost btn-sm" id="delete-note-detail-btn" style="color:var(--rejected);border-color:var(--rejected);">Delete</button></div>
+        <div class="right">
+          <button type="button" class="btn btn-ghost" id="close-note-detail">Close</button>
+          <button type="button" class="btn btn-ink" id="edit-note-detail-btn">Edit</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function openNoteDetailModal(note){
+  openModal(noteDetailModalHTML(note));
+  document.getElementById('close-note-detail').addEventListener('click', closeModal);
+  document.getElementById('edit-note-detail-btn').addEventListener('click', ()=>{
+    closeModal();
+    openNoteModal(note);
+  });
+  document.querySelector('.note-detail .pin-btn').addEventListener('click', async ()=>{
+    note.pinned = !note.pinned;
+    await saveState();
+    closeModal();
+    renderNotes(); renderDashboard();
+  });
+  document.getElementById('delete-note-detail-btn').addEventListener('click', async ()=>{
+    if(!confirmAction(`Delete "${note.title || 'this note'}"? This cannot be undone.`)) return;
+    state.notes = state.notes.filter(n=>n.id!==note.id);
+    logActivity('Note', 'Deleted', note.title || note.text.slice(0,40));
+    await saveState();
+    closeModal();
+    renderNotes(); renderDashboard();
+  });
+}
 function noteModalHTML(note){
   return `
     <h2>Edit note</h2>
@@ -1623,13 +1747,15 @@ function renderNotes(){
   grid.innerHTML = sorted.map(n=>`
     <div class="note-card" data-id="${n.id}" style="background:${NOTE_COLORS[n.color]||NOTE_COLORS.plain}">
       <div class="folder-badge">${escapeHTML(n.folder || 'General')}</div>
-      ${n.title? `<h4>${escapeHTML(n.title)}</h4>` : ''}
-      <p>${escapeHTML(n.text)}</p>
+      ${n.title? `<h4>${escapeHTML(n.title)}</h4>` : `<h4 class="untitled-note">${escapeHTML((n.text||'').slice(0,60))}${(n.text||'').length>60?'…':''}</h4>`}
       <div class="nfoot">
         <span class="meta">${new Date(n.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric'})} · ${new Date(n.createdAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</span>
         <div class="sp">
           <button class="icon-btn pin-btn" data-id="${n.id}" title="Pin">
             <svg viewBox="0 0 24 24" fill="${n.pinned?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2l1.5 5.5L19 9l-5 3 1 6-3-3.2L9 18l1-6-5-3 5.5-1.5z"/></svg>
+          </button>
+          <button class="icon-btn edit-note-btn" data-id="${n.id}" title="Edit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
           </button>
           <button class="icon-btn delete-note-btn" data-id="${n.id}" title="Delete">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0-1 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 6"/></svg>
@@ -1643,16 +1769,24 @@ function renderNotes(){
     const n = state.notes.find(x=>x.id===card.dataset.id);
     if(!n) return '';
     let html = `<span class="tt-title">${escapeHTML(n.title)||'Untitled note'}</span>`;
-    html += `<div class="tt-row"><b>Folder:</b> ${escapeHTML(n.folder || 'General')}</div>`;
-    html += `<div class="tt-row"><b>Created:</b> ${new Date(n.createdAt).toLocaleString()}</div>`;
-    if(n.text) html += `<div class="tt-desc">${escapeHTML(n.text.slice(0,260))}${n.text.length>260?'…':''}</div>`;
+    let meta = `<div class="tt-row"><b>Folder</b> ${escapeHTML(n.folder || 'General')}</div>`;
+    meta += `<div class="tt-row"><b>Created</b> ${new Date(n.createdAt).toLocaleString()}</div>`;
+    html += `<div class="tt-meta">${meta}</div>`;
+    if(n.text) html += `<div class="tt-desc">${escapeHTML(n.text)}</div>`;
     return html;
   });
 
   grid.querySelectorAll('.note-card').forEach(card=>{
     card.addEventListener('click', (e)=>{
-      if(e.target.closest('.pin-btn') || e.target.closest('.delete-note-btn')) return;
+      if(e.target.closest('.pin-btn') || e.target.closest('.delete-note-btn') || e.target.closest('.edit-note-btn')) return;
       const note = state.notes.find(n=>n.id===card.dataset.id);
+      openNoteDetailModal(note);
+    });
+  });
+  grid.querySelectorAll('.edit-note-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const note = state.notes.find(n=>n.id===btn.dataset.id);
       openNoteModal(note);
     });
   });
@@ -1838,9 +1972,10 @@ function renderBookmarks(){
     const b = state.bookmarks.find(x=>x.id===card.dataset.id);
     if(!b) return '';
     let html = `<span class="tt-title">${escapeHTML(b.title)||'Untitled'}</span>`;
-    html += `<div class="tt-row"><b>URL:</b> ${escapeHTML(b.url)}</div>`;
-    html += `<div class="tt-row"><b>Folder:</b> ${escapeHTML(b.folder || 'General')}</div>`;
-    if(b.createdAt) html += `<div class="tt-row"><b>Saved:</b> ${new Date(b.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric'})} · ${new Date(b.createdAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</div>`;
+    let meta = `<div class="tt-row"><b>URL</b> ${escapeHTML(b.url)}</div>`;
+    meta += `<div class="tt-row"><b>Folder</b> ${escapeHTML(b.folder || 'General')}</div>`;
+    if(b.createdAt) meta += `<div class="tt-row"><b>Saved</b> ${new Date(b.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric'})} · ${new Date(b.createdAt).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}</div>`;
+    html += `<div class="tt-meta">${meta}</div>`;
     return html;
   });
 
@@ -1956,32 +2091,37 @@ function ensureTooltipEl(){
   }
   return el;
 }
-function showTooltip(html, evt){
+function showTooltip(html, card){
   const el = ensureTooltipEl();
   el.innerHTML = html;
   el.style.display = 'block';
-  positionTooltip(evt);
+  positionTooltip(card);
+  requestAnimationFrame(()=> el.classList.add('is-visible'));
 }
-function positionTooltip(evt){
+function positionTooltip(card){
   const el = document.getElementById('hover-tooltip');
   if(!el || el.style.display === 'none') return;
-  const pad = 16;
+  const pad = 10;
+  const cardRect = card.getBoundingClientRect();
   const rect = el.getBoundingClientRect();
-  let x = evt.clientX + pad;
-  let y = evt.clientY + pad;
-  if(x + rect.width > window.innerWidth - 10) x = evt.clientX - rect.width - pad;
+  // Anchor to the card itself so the tooltip stays put instead of chasing the cursor.
+  let x = cardRect.right + pad;
+  let y = cardRect.top;
+  if(x + rect.width > window.innerWidth - 10) x = cardRect.left - rect.width - pad;
+  if(x < 10) x = Math.min(cardRect.left, window.innerWidth - rect.width - 10);
   if(y + rect.height > window.innerHeight - 10) y = window.innerHeight - rect.height - 10;
   el.style.left = Math.max(10,x) + 'px';
   el.style.top = Math.max(10,y) + 'px';
 }
 function hideTooltip(){
   const el = document.getElementById('hover-tooltip');
-  if(el) el.style.display = 'none';
+  if(!el) return;
+  el.classList.remove('is-visible');
+  setTimeout(()=>{ if(!el.classList.contains('is-visible')) el.style.display = 'none'; }, 120);
 }
 function attachHoverTooltip(elements, buildHTML){
   elements.forEach(card=>{
-    card.addEventListener('mouseenter', (e)=> showTooltip(buildHTML(card), e));
-    card.addEventListener('mousemove', (e)=> positionTooltip(e));
+    card.addEventListener('mouseenter', ()=> showTooltip(buildHTML(card), card));
     card.addEventListener('mouseleave', hideTooltip);
   });
 }
