@@ -11,6 +11,18 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
 <meta name="theme-color" content="#1C1B19">
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('vahub:theme');
+      if(saved === 'dark' || saved === 'light'){
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    }catch(e){}
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -56,6 +68,19 @@
     --font-body:'Inter', sans-serif;
     --font-mono:'Inter', sans-serif;
   }
+  html[data-theme="dark"]{
+    --ink:#F5F5F5;
+    --ink-soft:#8B8D98;
+    --paper:#0B0B0C;
+    --paper-2:#131315;
+    --card:#161619;
+    --line:rgba(255,255,255,0.08);
+    --sidebar:#0B0B0C;
+    --sidebar-text:#F5F5F5;
+    --sidebar-text-dim:#6B6D76;
+  }
+  html[data-theme="dark"] .brand img{ filter:invert(1) brightness(1.15); }
+  html[data-theme="dark"] .modal-overlay{ background:rgba(0,0,0,0.75); }
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
@@ -89,7 +114,7 @@
     border-bottom:1px solid var(--line);
     margin-bottom:12px;
   }
-  .brand img{ height:72px; width:auto; display:block; filter:invert(1) brightness(1.15); }
+  .brand img{ height:72px; width:auto; display:block; }
 
   .tab-btn{
     position:relative;
@@ -132,6 +157,40 @@
     color:var(--sidebar-text-dim);
     border-top:1px solid var(--line);
   }
+  .theme-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    background:var(--card);
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    user-select:none;
+    flex-shrink:0;
+  }
+  .theme-toggle svg{ width:14px; height:14px; flex-shrink:0; }
+  .theme-toggle .ttrack{
+    position:relative;
+    width:34px; height:18px;
+    border-radius:20px;
+    background:var(--line);
+    flex-shrink:0;
+  }
+  .theme-toggle .tthumb{
+    position:absolute;
+    top:2px; left:2px;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--ink);
+    transition:left .15s ease;
+  }
+  html[data-theme="dark"] .theme-toggle .tthumb{ left:18px; }
 
   .tab-btn-right{
     margin-left:auto;
@@ -369,6 +428,15 @@
 
   /* ---------- Login overlay ---------- */
   .login-overlay{
+    --ink:#191B1A;
+    --ink-soft:#5B615C;
+    --paper:#FAFAF9;
+    --paper-2:#F1F1EF;
+    --card:#FFFFFF;
+    --line:rgba(25,27,26,0.12);
+    --sidebar:#FFFFFF;
+    --sidebar-text:#191B1A;
+    --sidebar-text-dim:#8A8F89;
     position:fixed;
     inset:0;
     z-index:99999;
@@ -423,23 +491,6 @@
     color:var(--ink);
   }
   .login-left input:focus{outline:none; border-color:var(--ink);}
-  .login-remember{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:13px;
-    color:var(--ink-soft);
-    margin:2px 0 18px 0;
-    cursor:pointer;
-    user-select:none;
-  }
-  .login-remember input{
-    width:15px;
-    height:15px;
-    margin:0;
-    accent-color:var(--ink);
-    cursor:pointer;
-  }
   .login-error{
     min-height:18px;
     font-size:12.5px;
@@ -567,19 +618,21 @@
     break-inside:avoid; margin-bottom:14px; border-radius:14px; padding:16px; border:1px solid rgba(35,42,51,0.1);
     display:flex; flex-direction:column; gap:8px;
   }
-  .note-card h4{margin:0; font-family:var(--font-display); font-size:15.5px; font-weight:600;}
+  .note-card h4{margin:0; font-family:var(--font-display); font-size:15.5px; font-weight:600; color:#191B1A;}
   .note-card .folder-badge{
     align-self:flex-start; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.4px;
-    color:var(--ink-soft); background:rgba(35,42,51,0.08); padding:2px 8px; border-radius:20px;
+    color:#5B615C; background:rgba(35,42,51,0.08); padding:2px 8px; border-radius:20px;
   }
   .note-card{cursor:pointer;}
   .note-card p{
-    margin:0; font-size:13px; line-height:1.5; color:var(--ink);
+    margin:0; font-size:13px; line-height:1.5; color:#191B1A;
     display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:5; overflow:hidden;
   }
   .note-card .nfoot{display:flex; align-items:center; margin-top:4px;}
-  .note-card .nfoot .meta{font-family:var(--font-mono); font-size:10px; color:var(--ink-soft);}
+  .note-card .nfoot .meta{font-family:var(--font-mono); font-size:10px; color:#5B615C;}
   .note-card .nfoot .sp{margin-left:auto; display:flex; gap:2px;}
+  .note-card .icon-btn{ color:#5B615C; }
+  .note-card .icon-btn:hover{ color:#191B1A; background:rgba(35,42,51,0.08); }
 
   /* ---------- Bookmarks ---------- */
   .bookmark-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;}
@@ -590,7 +643,7 @@
   .bookmark-card:hover{box-shadow:0 4px 14px rgba(35,42,51,0.12); transform:translateY(-2px);}
   .bookmark-top{display:flex; align-items:center; gap:10px; min-width:0;}
   .bookmark-favicon{
-    width:30px; height:30px; border-radius:8px; background:#fff; border:1px solid var(--line);
+    width:30px; height:30px; border-radius:8px; background:var(--paper-2); border:1px solid var(--line);
     display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;
   }
   .bookmark-favicon img{width:18px; height:18px;}
@@ -666,10 +719,6 @@
       <form id="login-form" autocomplete="off">
         <input type="text" id="login-username" placeholder="Username" autocomplete="username" />
         <input type="password" id="login-passcode" placeholder="Password" autocomplete="new-password" />
-        <label class="login-remember">
-          <input type="checkbox" id="login-remember" checked />
-          <span>Remember me on this device</span>
-        </label>
         <button type="submit" class="btn btn-ink" style="width:100%;justify-content:center;">Log In</button>
       </form>
       <div id="login-error" class="login-error"></div>
@@ -742,6 +791,11 @@
           <h1>Hi, <span class="name-highlight">Angelo!</span></h1>
           <p id="today-str"></p>
         </div>
+        <button type="button" class="theme-toggle" id="theme-toggle-btn" title="Toggle dark mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <span class="ttrack"><span class="tthumb"></span></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
       </div>
       <div class="stat-grid">
         <div class="stat-card"><div class="num" id="stat-total-jobs">0</div><div class="lbl">Applications</div></div>
@@ -877,7 +931,8 @@ const STORAGE_KEY = 'vahub:data';
 let state = { jobs: [], prompts: [], notes: [], bookmarks: [], activity: [], settings: { sheetsUrl: '', lastSynced: null } };
 let loaded = false;
 
-const ACTIVITY_COLOR = { Application:'var(--jobs-tab)', Prompt:'var(--prompts)', Note:'var(--notes-tab)', Bookmark:'var(--bookmarks-tab)' };
+const ACTIVITY_COLOR = { Application:'#D7D7D6', Prompt:'#B7B8BB', Note:'#A08A81', Bookmark:'#595D66' };
+const ACTIVITY_TEXT_COLOR = { Application:'#272B36', Prompt:'#272B36', Note:'#272B36', Bookmark:'#fff' };
 
 const STATUS_ORDER = ['Applied','Interviewing','Offer','Rejected'];
 const STATUS_COLOR = { Applied:'var(--applied)', Interviewing:'var(--interviewing)', Offer:'var(--offer)', Rejected:'var(--rejected)' };
@@ -2062,7 +2117,7 @@ function renderActivity(){
   }
   const rows = state.activity.slice(0, 40).map(a=>`
     <div class="activity-row">
-      <span class="activity-badge" style="background:${ACTIVITY_COLOR[a.category] || 'var(--ink-soft)'}">${escapeHTML(a.category)}</span>
+      <span class="activity-badge" style="background:${ACTIVITY_COLOR[a.category] || 'var(--ink-soft)'};color:${ACTIVITY_TEXT_COLOR[a.category] || '#fff'}">${escapeHTML(a.category)}</span>
       <span class="activity-action ${a.action.toLowerCase()}">${escapeHTML(a.action)}</span>
       <span class="activity-label" title="${escapeAttr(a.label)}">${escapeHTML(a.label)}</span>
       <span class="activity-time">${timeAgo(a.time)}</span>
@@ -2136,6 +2191,20 @@ function escapeAttr(str){
   return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+/* ---------------- theme toggle ---------------- */
+function currentTheme(){
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+}
+function setTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  try{ localStorage.setItem('vahub:theme', theme); }catch(e){}
+}
+function toggleTheme(){
+  setTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+}
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+if(themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+
 /* ---------------- login gate ---------------- */
 const APP_USERNAME = "angelo"; // change this to your own username
 // SHA-256 hash of the password (not the plaintext password itself).
@@ -2143,7 +2212,6 @@ const APP_USERNAME = "angelo"; // change this to your own username
 //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourNewPassword')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
 // then paste the printed hex string below.
 const APP_PASSCODE_HASH = "970cff827cae6d428496d03b36e73c4e1b5315a9f7be05fd4002b77eb9b5be93";
-const AUTH_KEY = "vahub:authed";
 
 async function sha256Hex(text){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -2160,15 +2228,9 @@ document.getElementById('login-form').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const userInput = document.getElementById('login-username');
   const passInput = document.getElementById('login-passcode');
-  const rememberInput = document.getElementById('login-remember');
   const errorEl = document.getElementById('login-error');
   const enteredHash = await sha256Hex(passInput.value);
   if(userInput.value.trim().toLowerCase() === APP_USERNAME.toLowerCase() && enteredHash === APP_PASSCODE_HASH){
-    if(rememberInput.checked){
-      localStorage.setItem(AUTH_KEY, 'true');
-    } else {
-      sessionStorage.setItem(AUTH_KEY, 'true');
-    }
     errorEl.textContent = '';
     showApp();
   } else {
@@ -2178,11 +2240,7 @@ document.getElementById('login-form').addEventListener('submit', async (e)=>{
   }
 });
 
-if(localStorage.getItem(AUTH_KEY) === 'true' || sessionStorage.getItem(AUTH_KEY) === 'true'){
-  showApp();
-} else {
-  document.getElementById('login-username').focus();
-}
+document.getElementById('login-username').focus();
 
 /* ---------------- init ---------------- */
 async function initApp(){
