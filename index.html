@@ -1220,30 +1220,49 @@ function renderJobs(){
 /* ================= GOOGLE SHEETS SYNC ================= */
 const SHEETS_SCRIPT = `function doPost(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Applications') || ss.insertSheet('Applications');
   var data = JSON.parse(e.postData.contents);
-  var jobs = data.jobs || [];
-  var headers = ['ID','Company','Position','Status','Date Applied','Employment Type','Salary','Contact','Link','Job Summary','Scope of Work'];
+
+  writeSheet_(ss, 'Applications', ['ID','Company','Position','Status','Date Applied','Employment Type','Salary','Contact','Link','Job Summary','Scope of Work'],
+    (data.jobs || []).map(function(j){ return [j.id, j.company, j.position, j.status, j.dateApplied, j.employmentType, j.salary, j.contact, j.link, j.description, j.scope]; }));
+
+  writeSheet_(ss, 'Prompts', ['ID','Title','Tag','Content','Created At'],
+    (data.prompts || []).map(function(p){ return [p.id, p.title, p.tag, p.content, p.createdAt]; }));
+
+  writeSheet_(ss, 'Notes', ['ID','Title','Text','Color','Folder','Pinned','Created At'],
+    (data.notes || []).map(function(n){ return [n.id, n.title, n.text, n.color, n.folder, n.pinned, n.createdAt]; }));
+
+  writeSheet_(ss, 'Bookmarks', ['ID','Title','URL','Folder','Created At'],
+    (data.bookmarks || []).map(function(b){ return [b.id, b.title, b.url, b.folder, b.createdAt]; }));
+
+  return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+}
+
+function writeSheet_(ss, name, headers, rows) {
+  var sheet = ss.getSheetByName(name) || ss.insertSheet(name);
   sheet.clearContents();
   sheet.appendRow(headers);
-  jobs.forEach(function(j){
-    sheet.appendRow([j.id, j.company, j.position, j.status, j.dateApplied, j.employmentType, j.salary, j.contact, j.link, j.description, j.scope]);
-  });
-  return ContentService.createTextOutput(JSON.stringify({ok:true, count:jobs.length})).setMimeType(ContentService.MimeType.JSON);
+  rows.forEach(function(r){ sheet.appendRow(r); });
 }
 
 function doGet(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  return ContentService.createTextOutput(JSON.stringify({
+    jobs: readJobs_(ss),
+    prompts: readPrompts_(ss),
+    notes: readNotes_(ss),
+    bookmarks: readBookmarks_(ss)
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function readJobs_(ss) {
   var sheet = ss.getSheetByName('Applications');
-  if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify({jobs: []})).setMimeType(ContentService.MimeType.JSON);
-  }
+  if (!sheet) return [];
   var rows = sheet.getDataRange().getValues();
-  var jobs = [];
+  var out = [];
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
     if (!r[1] && !r[2]) continue;
-    jobs.push({
+    out.push({
       id: r[0] ? String(r[0]) : Utilities.getUuid(),
       company: r[1] || '',
       position: r[2] || '',
@@ -1257,14 +1276,73 @@ function doGet(e) {
       scope: r[10] || ''
     });
   }
-  return ContentService.createTextOutput(JSON.stringify({jobs: jobs})).setMimeType(ContentService.MimeType.JSON);
+  return out;
+}
+
+function readPrompts_(ss) {
+  var sheet = ss.getSheetByName('Prompts');
+  if (!sheet) return [];
+  var rows = sheet.getDataRange().getValues();
+  var out = [];
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r[1] && !r[3]) continue;
+    out.push({
+      id: r[0] ? String(r[0]) : Utilities.getUuid(),
+      title: r[1] || '',
+      tag: r[2] || 'General',
+      content: r[3] || '',
+      createdAt: r[4] ? Number(r[4]) : Date.now()
+    });
+  }
+  return out;
+}
+
+function readNotes_(ss) {
+  var sheet = ss.getSheetByName('Notes');
+  if (!sheet) return [];
+  var rows = sheet.getDataRange().getValues();
+  var out = [];
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r[1] && !r[2]) continue;
+    out.push({
+      id: r[0] ? String(r[0]) : Utilities.getUuid(),
+      title: r[1] || '',
+      text: r[2] || '',
+      color: r[3] || 'plain',
+      folder: r[4] || 'General',
+      pinned: (r[5] === true || r[5] === 'TRUE' || r[5] === 'true'),
+      createdAt: r[6] ? Number(r[6]) : Date.now()
+    });
+  }
+  return out;
+}
+
+function readBookmarks_(ss) {
+  var sheet = ss.getSheetByName('Bookmarks');
+  if (!sheet) return [];
+  var rows = sheet.getDataRange().getValues();
+  var out = [];
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r[1] && !r[2]) continue;
+    out.push({
+      id: r[0] ? String(r[0]) : Utilities.getUuid(),
+      title: r[1] || '',
+      url: r[2] || '',
+      folder: r[3] || 'General',
+      createdAt: r[4] ? Number(r[4]) : Date.now()
+    });
+  }
+  return out;
 }`;
 
 function sheetsModalHTML(){
   const url = state.settings.sheetsUrl || '';
   return `
     <h2>Connect Google Sheet</h2>
-    <p style="font-size:12.5px;color:var(--ink-soft);margin:-6px 0 12px 0;">Your Sheet becomes the real database — applications load from it and save back to it automatically.</p>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:-6px 0 12px 0;">Your Sheet becomes the real database — Applications, Prompts, Notes, and Bookmarks each get their own tab, loading and saving automatically.</p>
     <ol class="sheets-steps">
       <li>Open (or create) the Google Sheet you want your applications to live in.</li>
       <li>Go to <b>Extensions → Apps Script</b>, delete any placeholder code, and paste the script below.</li>
@@ -1317,18 +1395,21 @@ function openSheetsModal(){
     closeModal();
     updateSheetsStatusUI();
     if(url){
-      // Sheet already has rows (e.g. reconnecting on a new device) -> pull them in.
-      // Sheet is empty (first-ever connect) -> push whatever's local up as the seed.
-      const pulled = await loadJobsFromSheet();
-      if(!pulled) await syncJobsToSheet();
+      // Each section is merged independently: if the Sheet already has rows for
+      // that section, those rows become the local source of truth for it. If a
+      // section is empty on the Sheet (e.g. a freshly added tab), the local data
+      // for that section is left alone. Afterward we always push, so any
+      // still-empty tabs get filled in with the local data.
+      await loadAllFromSheet();
+      await syncAllToSheet();
     }
   });
 }
 
-async function syncJobsToSheet(){
+async function syncAllToSheet(){
   const url = state.settings.sheetsUrl;
   if(!url) return;
-  const payload = JSON.stringify({ jobs: state.jobs });
+  const payload = JSON.stringify({ jobs: state.jobs, prompts: state.prompts, notes: state.notes, bookmarks: state.bookmarks });
   try{
     await fetch(url, {
       method: 'POST',
@@ -1344,9 +1425,11 @@ async function syncJobsToSheet(){
   updateSheetsStatusUI();
 }
 
-// Pulls jobs from the connected Sheet and makes it the source of truth locally.
-// Returns true if it found existing rows in the Sheet, false otherwise.
-async function loadJobsFromSheet(){
+// Pulls data from the connected Sheet. Each of jobs/prompts/notes/bookmarks is
+// only overwritten locally if the Sheet actually has rows for it — an empty tab
+// on the Sheet side never wipes out local data. Returns true if the fetch
+// succeeded at all (regardless of whether any section had rows).
+async function loadAllFromSheet(){
   const url = state.settings.sheetsUrl;
   if(!url) return false;
   try{
@@ -1354,11 +1437,19 @@ async function loadJobsFromSheet(){
     if(!res.ok) return false;
     const data = await res.json();
     const jobs = data.jobs || [];
-    if(jobs.length === 0) return false;
-    state.jobs = jobs;
+    const prompts = data.prompts || [];
+    const notes = data.notes || [];
+    const bookmarks = data.bookmarks || [];
+    if(jobs.length) state.jobs = jobs;
+    if(prompts.length) state.prompts = prompts;
+    if(notes.length) state.notes = notes;
+    if(bookmarks.length) state.bookmarks = bookmarks;
     state.settings.lastSynced = Date.now();
     await saveState();
     renderJobs();
+    renderPrompts();
+    renderNotes();
+    renderBookmarks();
     renderDashboard();
     updateSheetsStatusUI();
     return true;
@@ -1366,7 +1457,6 @@ async function loadJobsFromSheet(){
     console.error('Sheets read error', err);
     return false;
   }
-
 }
 
 function updateSheetsStatusUI(){
@@ -1389,7 +1479,25 @@ document.getElementById('sheets-status-btn').addEventListener('click', openSheet
 function afterJobsChanged(){
   renderJobs();
   renderDashboard();
-  if(state.settings.sheetsUrl) syncJobsToSheet();
+  if(state.settings.sheetsUrl) syncAllToSheet();
+}
+
+function afterPromptsChanged(){
+  renderPrompts();
+  renderDashboard();
+  if(state.settings.sheetsUrl) syncAllToSheet();
+}
+
+function afterNotesChanged(){
+  renderNotes();
+  renderDashboard();
+  if(state.settings.sheetsUrl) syncAllToSheet();
+}
+
+function afterBookmarksChanged(){
+  renderBookmarks();
+  renderDashboard();
+  if(state.settings.sheetsUrl) syncAllToSheet();
 }
 
 /* ================= PROMPTS ================= */
@@ -1436,7 +1544,7 @@ function openPromptDetailModal(p){
     logActivity('Prompt', 'Deleted', p.title);
     await saveState();
     closeModal();
-    renderPrompts(); renderDashboard();
+    afterPromptsChanged();
   });
 }
 function promptModalHTML(p){
@@ -1469,7 +1577,7 @@ function openPromptModal(p){
       logActivity('Prompt', 'Deleted', p.title);
       await saveState();
       closeModal();
-      renderPrompts(); renderDashboard();
+      afterPromptsChanged();
     });
   }
   document.getElementById('prompt-form').addEventListener('submit', async (e)=>{
@@ -1492,7 +1600,7 @@ function openPromptModal(p){
     }
     await saveState();
     closeModal();
-    renderPrompts(); renderDashboard();
+    afterPromptsChanged();
   });
 }
 
@@ -1637,7 +1745,7 @@ document.getElementById('save-note-btn').addEventListener('click', async ()=>{
   logActivity('Note', 'Added', title || text.slice(0,40));
   await saveState();
   resetComposer();
-  renderNotes(); renderDashboard();
+  afterNotesChanged();
 });
 
 /* ---- note edit modal ---- */
@@ -1676,7 +1784,7 @@ function openNoteDetailModal(note){
     note.pinned = !note.pinned;
     await saveState();
     closeModal();
-    renderNotes(); renderDashboard();
+    afterNotesChanged();
   });
   document.getElementById('delete-note-detail-btn').addEventListener('click', async ()=>{
     if(!confirmAction(`Delete "${note.title || 'this note'}"? This cannot be undone.`)) return;
@@ -1684,7 +1792,7 @@ function openNoteDetailModal(note){
     logActivity('Note', 'Deleted', note.title || note.text.slice(0,40));
     await saveState();
     closeModal();
-    renderNotes(); renderDashboard();
+    afterNotesChanged();
   });
 }
 function noteModalHTML(note){
@@ -1730,7 +1838,7 @@ function openNoteModal(note){
     logActivity('Note', 'Deleted', note.title || note.text.slice(0,40));
     await saveState();
     closeModal();
-    renderNotes(); renderDashboard();
+    afterNotesChanged();
   });
   document.getElementById('note-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -1742,7 +1850,7 @@ function openNoteModal(note){
     logActivity('Note', 'Updated', note.title || note.text.slice(0,40));
     await saveState();
     closeModal();
-    renderNotes(); renderDashboard();
+    afterNotesChanged();
   });
 }
 
@@ -1851,7 +1959,7 @@ function renderNotes(){
       const note = state.notes.find(n=>n.id===btn.dataset.id);
       note.pinned = !note.pinned;
       await saveState();
-      renderNotes(); renderDashboard();
+      afterNotesChanged();
     });
   });
   grid.querySelectorAll('.delete-note-btn').forEach(btn=>{
@@ -1862,7 +1970,7 @@ function renderNotes(){
       state.notes = state.notes.filter(n=>n.id!==btn.dataset.id);
       if(note) logActivity('Note', 'Deleted', note.title || (note.text||'').slice(0,40));
       await saveState();
-      renderNotes(); renderDashboard();
+      afterNotesChanged();
     });
   });
 }
@@ -1914,7 +2022,7 @@ function openBookmarkModal(b){
       logActivity('Bookmark', 'Deleted', b.title || b.url);
       await saveState();
       closeModal();
-      renderBookmarks(); renderDashboard();
+      afterBookmarksChanged();
     });
   }
   document.getElementById('bookmark-form').addEventListener('submit', async (e)=>{
@@ -1939,7 +2047,7 @@ function openBookmarkModal(b){
     }
     await saveState();
     closeModal();
-    renderBookmarks(); renderDashboard();
+    afterBookmarksChanged();
   });
 }
 
@@ -2055,7 +2163,7 @@ function renderBookmarks(){
       state.bookmarks = state.bookmarks.filter(x=>x.id!==btn.dataset.id);
       if(b) logActivity('Bookmark', 'Deleted', b.title || b.url);
       await saveState();
-      renderBookmarks(); renderDashboard();
+      afterBookmarksChanged();
     });
   });
 }
@@ -2258,7 +2366,7 @@ async function initApp(){
     await saveState();
     renderActivity();
   });
-  if(state.settings.sheetsUrl) await loadJobsFromSheet();
+  if(state.settings.sheetsUrl) await loadAllFromSheet();
 }
 </script>
 </body>
